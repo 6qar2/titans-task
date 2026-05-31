@@ -2,11 +2,510 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TITANS — Task Submission</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C; --gold-light: #E8CC7A; --gold-dim: #8B6B2A; --gold-pale: #F5E8C0;
+    --crimson: #8B0000; --crimson-deep: #5C0000; --crimson-bright: #B30000;
+    --black: #0A0A0A; --surface: #111111; --surface-2: #181818; --surface-3: #222222;
+    --border: rgba(201,168,76,0.15); --border-strong: rgba(201,168,76,0.35);
+    --text-muted: rgba(245,232,192,0.45);
+  }
+  html, body { min-height: 100vh; background: var(--black); color: var(--gold-pale); font-family: 'Cormorant Garamond', Georgia, serif; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(139,0,0,0.45) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 5% 95%, rgba(139,0,0,0.25) 0%, transparent 55%), radial-gradient(ellipse 60% 50% at 95% 85%, rgba(92,0,0,0.20) 0%, transparent 55%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+  .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 60px 24px 80px; }
+  .header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.9s ease both; }
+  .crown-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .crown-line { height: 1px; width: 120px; background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold)); }
+  .crown-line.right { background: linear-gradient(90deg, var(--gold), var(--gold-dim), transparent); }
+  .bar-diamond { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 10px rgba(201,168,76,0.5); }
+  .title-eyebrow { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.5em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-family: 'Cinzel', serif; font-size: clamp(52px, 10vw, 96px); font-weight: 900; letter-spacing: 0.12em; line-height: 1; color: var(--gold); text-shadow: 0 0 40px rgba(201,168,76,0.25), 0 2px 0 var(--gold-dim); margin-bottom: 10px; }
+  .crimson-bar { width: 160px; height: 2px; background: linear-gradient(90deg, transparent, #8B0000, #B30000, #8B0000, transparent); margin: 0 auto 8px; box-shadow: 0 0 12px rgba(139,0,0,0.5); }
+  .subtitle { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: var(--text-muted); letter-spacing: 0.08em; }
+  .divider { display: flex; align-items: center; gap: 14px; margin: 24px auto 0; width: fit-content; }
+  .divider-line { height: 1px; width: 60px; background: linear-gradient(90deg, transparent, var(--gold-dim)); }
+  .divider-line.r { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+  .divider-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(201,168,76,0.5); }
+
+  /* ── QUOTE BLOCK — fixed visibility ── */
+  .quote-block {
+    width: 100%; max-width: 620px; text-align: left; margin-bottom: 36px;
+    animation: fadeUp 1s ease 0.1s both;
+    border-left: 2px solid #B30000;
+    padding: 18px 24px;
+    background: rgba(139,0,0,0.10);
+    border-radius: 0 2px 2px 0;
+    box-shadow: -4px 0 24px rgba(139,0,0,0.25), inset 0 0 40px rgba(139,0,0,0.05);
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    font-weight: 400;
+    /* FIX: was 0.6 opacity — bumped to fully opaque gold-pale so it's actually readable */
+    color: var(--gold-pale);
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .quote-attr {
+    margin-top: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 9.5px;
+    letter-spacing: 0.35em;
+    /* FIX: was gold-dim (very dark) — now gold so it's visible */
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .card { width: 100%; max-width: 620px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid #8B0000; border-radius: 2px; padding: 52px 52px 56px; position: relative; animation: fadeUp 1s ease 0.2s both; box-shadow: 0 0 0 1px rgba(201,168,76,0.04), 0 40px 80px rgba(0,0,0,0.6), -8px 0 40px rgba(139,0,0,0.25), inset 0 1px 0 rgba(201,168,76,0.08); }
+  .card::before, .card::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--gold-dim); border-style: solid; }
+  .card::before { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+  .card::after { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+  .inner-corner-tr, .inner-corner-bl { position: absolute; width: 24px; height: 24px; border-color: var(--gold-dim); border-style: solid; }
+  .inner-corner-tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
+  .inner-corner-bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
+  .field { margin-bottom: 32px; }
+  label.field-label { display: block; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 10px; }
+  .field-hint { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: var(--text-muted); margin-top: -6px; margin-bottom: 10px; }
+  input[type="text"], select { width: 100%; height: 50px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 1px; color: var(--gold-pale); font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 400; padding: 0 18px; outline: none; transition: border-color 0.25s, box-shadow 0.25s; appearance: none; -webkit-appearance: none; }
+  input[type="text"]::placeholder { color: var(--text-muted); font-style: italic; }
+  input[type="text"]:focus, select:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 1px rgba(201,168,76,0.12), 0 0 20px rgba(201,168,76,0.06); }
+  .select-wrap { position: relative; }
+  .select-arrow { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--gold-dim); font-size: 10px; }
+  select option { background: var(--surface-3); color: var(--gold-pale); }
+  .field-divider { display: flex; align-items: center; gap: 16px; margin: 36px 0; }
+  .field-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+  .field-divider .diamond-sm { width: 5px; height: 5px; background: #8B0000; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 6px rgba(139,0,0,0.6); }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    width: 100%; min-height: 160px;
+    border: 1px dashed var(--border-strong); border-radius: 2px;
+    background: var(--surface-2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    user-select: none;
+  }
+  .upload-zone.dragover {
+    border-color: var(--gold);
+    background: rgba(139,0,0,0.06);
+    box-shadow: inset 0 0 30px rgba(139,0,0,0.08);
+  }
+  .field.error .upload-zone {
+    border-color: rgba(200, 40, 40, 0.6);
+    box-shadow: inset 0 0 16px rgba(200,0,0,0.07);
+  }
+  .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; }
+  .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; }
+  .upload-types { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; }
+  .btn-browse {
+    margin-top: 4px;
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.25s;
+  }
+  .btn-browse:hover { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+  /* position off-screen — display:none blocks programmatic .click() */
+  #fileInput { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+
+  .file-chosen { display: none; align-items: center; gap: 14px; padding: 16px 20px; background: rgba(139,0,0,0.15); border: 1px solid rgba(139,0,0,0.3); border-radius: 2px; margin-top: 12px; }
+  .file-chosen.visible { display: flex; }
+  .file-icon { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+  .file-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--gold-pale); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 4px 6px; transition: color 0.2s; }
+  .file-remove:hover { color: var(--crimson-bright); }
+
+  .submit-wrap { margin-top: 44px; }
+  .btn-submit { width: 100%; height: 56px; background: linear-gradient(135deg, var(--crimson-deep) 0%, var(--crimson) 50%, var(--crimson-deep) 100%); border: 1px solid rgba(201,168,76,0.25); border-radius: 1px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); transition: all 0.3s; position: relative; overflow: hidden; }
+  .btn-submit:hover:not(:disabled) { border-color: var(--gold-dim); box-shadow: 0 0 30px rgba(139,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.15); transform: translateY(-1px); }
+  .btn-submit:active:not(:disabled) { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .progress-bar-wrap { margin-top: 16px; height: 2px; background: rgba(201,168,76,0.1); border-radius: 2px; overflow: hidden; display: none; }
+  .progress-bar-wrap.visible { display: block; }
+  .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8B0000, #C9A84C); transition: width 0.4s ease; }
+  .status-msg { margin-top: 14px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: var(--text-muted); text-align: center; min-height: 20px; transition: color 0.2s; }
+  .status-msg.is-error { color: rgba(255, 100, 100, 0.9); }
+
+  .success-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 40px 0; }
+  .success-overlay.visible { display: flex; }
+  .success-icon { width: 56px; height: 56px; stroke: var(--gold); fill: none; stroke-width: 1.2; filter: drop-shadow(0 0 12px rgba(201,168,76,0.4)); }
+  .success-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600; letter-spacing: 0.2em; color: var(--gold); }
+  .success-msg { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--text-muted); line-height: 1.6; }
+  .success-sheet-link { display: inline-block; margin-top: 8px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-decoration: none; border-bottom: 1px solid rgba(201,168,76,0.2); padding-bottom: 2px; text-transform: uppercase; transition: color 0.2s; }
+  .success-sheet-link:hover { color: var(--gold); }
+  .btn-again { margin-top: 8px; background: none; border: 1px solid var(--border-strong); color: var(--gold-dim); font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; padding: 12px 28px; cursor: pointer; border-radius: 1px; transition: all 0.25s; }
+  .btn-again:hover { border-color: var(--gold); color: var(--gold); }
+  .footer { margin-top: 52px; text-align: center; animation: fadeUp 1.2s ease 0.4s both; }
+  .footer-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(201,168,76,0.4); margin-bottom: 10px; letter-spacing: 0.03em; }
+  .footer p { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; color: rgba(201,168,76,0.2); text-transform: uppercase; }
+  .error-msg { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(255, 80, 80, 0.8); margin-top: 6px; display: none; }
+  .field.error input[type="text"], .field.error select { border-color: rgba(200, 40, 40, 0.5); }
+  .field.error .error-msg { display: block; }
+  #formContent { display: block; }
+  #formContent.hidden { display: none; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 600px) { .card { padding: 36px 28px 40px; } h1 { font-size: 52px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div style="position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#8B0000,#B30000,#8B0000,transparent);z-index:10;"></div>
+  <div style="position:fixed;top:3px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);z-index:10;"></div>
+
+  <header class="header">
+    <div class="crown-bar">
+      <div class="crown-line"></div>
+      <div class="bar-diamond"></div>
+      <div class="crown-line right"></div>
+    </div>
+    <p class="title-eyebrow">The Order of</p>
+    <h1>TITANS</h1>
+    <div class="crimson-bar"></div>
+    <p class="subtitle">Task Submission Portal</p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line r"></div>
+    </div>
+  </header>
+
+  <div class="quote-block">
+    <p class="quote-text" id="rotatingQuote"></p>
+    <p class="quote-attr">— Hesham Yasser, President of the Titans</p>
+  </div>
+
+  <div class="card" id="mainCard">
+    <div class="inner-corner-tr"></div>
+    <div class="inner-corner-bl"></div>
+
+    <div id="formContent">
+      <div class="field" id="fieldName">
+        <label class="field-label" for="memberName">Your Full Name</label>
+        <input type="text" id="memberName" placeholder="Enter your name…" autocomplete="off"/>
+        <p class="error-msg">Please enter your name before submitting.</p>
+      </div>
+
+      <div class="field" id="fieldCommittee">
+        <label class="field-label" for="committee">Committee</label>
+        <div class="select-wrap">
+          <select id="committee">
+            <option value="" disabled selected>— Select your committee —</option>
+            <option value="media">Media</option>
+            <option value="events">Events</option>
+            <option value="marketing">Marketing</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+        <p class="error-msg">Please select your committee.</p>
+      </div>
+
+      <div class="field-divider">
+        <hr><div class="diamond-sm"></div><hr>
+      </div>
+
+      <div class="field" id="fieldFile">
+        <label class="field-label">Task File</label>
+        <p class="field-hint">Drop your file here, or click to browse</p>
+
+        <!--
+          FIX: The file input now overlays the full wrapper at full size (opacity:0).
+          This is the most reliable cross-browser pattern — no more zero-size tricks.
+          The visual drop zone has pointer-events:none so the input above captures everything.
+        -->
+        <div class="upload-zone" id="uploadZone">
+            <svg class="upload-icon" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span class="upload-text">Drag &amp; drop your file here</span>
+            <span class="upload-types">PDF · Image · Document · Any format</span>
+            <label for="fileInput" class="btn-browse">Browse Files</label>
+          </div>
+          <input type="file" id="fileInput" style="display:none;" onchange="handleFileChange(this)" />
+        </div>
+
+        <div class="file-chosen" id="fileChosen">
+          <svg class="file-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span class="file-name" id="fileName"></span>
+          <button class="file-remove" id="fileRemove" type="button" title="Remove file">×</button>
+        </div>
+        <p class="error-msg">Please attach a file to submit.</p>
+      </div>
+
+      <div class="submit-wrap">
+        <button class="btn-submit" id="submitBtn" type="button">Submit Task</button>
+        <div class="progress-bar-wrap" id="progressWrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="status-msg" id="statusMsg"></p>
+      </div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+      <svg class="success-icon" viewBox="0 0 24 24">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <p class="success-title">Task Received</p>
+      <p class="success-msg">
+        Your submission has been saved to Drive.<br>
+        <span id="successDetail" style="color: var(--gold-pale);"></span>
+      </p>
+      <a class="success-sheet-link" href="https://docs.google.com/spreadsheets/d/1h1lXqQ5SBhAWUBlvGpB9IkfByX8rLX0lmRwBG48mKcY/edit" target="_blank">View Submissions Sheet</a>
+      <button class="btn-again" id="btnAgain" type="button">Submit Another Task</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-quote" id="footerQuote"></p>
+    <p>Titans Club &nbsp;·&nbsp; Members Portal &nbsp;·&nbsp; Confidential</p>
+  </footer>
+</div>
+
+<script>
+  function handleFileChange(input) {
+    if (!input.files || !input.files[0]) return;
+    const f = input.files[0];
+    document.getElementById('fileName').textContent = f.name;
+    document.getElementById('fileChosen').classList.add('visible');
+    document.getElementById('fieldFile').classList.remove('error');
+    window._selectedFile = f;
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js"></script>
+<script>
+  // UMD bundles can export under different names — find whichever one has SignJWT
+  const _jose = (typeof jose !== 'undefined' && jose.SignJWT) ? jose
+              : (typeof Jose !== 'undefined' && Jose.SignJWT) ? Jose
+              : null;
+  const SignJWT    = _jose && _jose.SignJWT;
+  const importPKCS8 = _jose && _jose.importPKCS8;
+</script>
+
+  // ── CONFIG ───────────────────────────────────────────────────────
+  const SERVICE_ACCOUNT = {
+    client_email: "titans-uploader@titans-club.iam.gserviceaccount.com",
+    private_key_id: "fbf9f115c4b70e1bbc959afaaff5a3f97eedf6dd",
+    private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDHfvy1guN+X9WN\nK9CNDode6L2hY6/3uEr7qsP/c7BUpGMTy9525cf6bgcr6YhsAMR+pZPP3GgWKCsY\nssCny6if4DGuhVriZ/vv4PQVizUKJOi2cS4+qb1dTjnHAJE7nY0PjlOTqZ0gjEAp\n6SuaBRdXeE8q2wFoaKO4ypjodWiJq61Za3hrbwE3GBnxoJpxLNef0YXbp1S/8+r3\nyggPiZKGwc8fK/qYmt2oSYkuOYHUfETsNjjNLtudIOac0Onkd8Nu/JEltUf//VoC\nFl4GMJMDr+XCF50mqEejubB9H88MZWTSgfsKQJ4+5zhrjUicX7oMDmL71Xprxsqj\nTbjf6OyzAgMBAAECggEAFQAuNCFiN2R5Q5IwMxkrcPdJNxsaZBZ3dkTEuzh/gHmJ\noITel1+bDKbWhG3iGZR/GuHtTH1kS6jQ2JnApClRR/s+36NULO9LWzYwG7B61eWK\nxeHmP1x4/cCFXoiVwVPVjKSr8ahyTQHWo1LTbzRH/8I/e0Bwxn/1dDeHnzj010EW\nm+vQmX7VGAScAeJhAIrd4w9BHfvOQoT2Y3QzwjF9ati2HST398pPwFzml3d4WIDG\nrydQ2AaRcBaAPnU4W2dP/IMROdpQl6XhPAPV+mX+YE8u8F/sS72ErqFmnZZgfckA\nDqGG8ZZLX8Er8IhL8PVYJmsYPTIPc0taaPPb8+IxoQKBgQDyvqnQ9++8OcVlGTSG\nakZoGj4mPgDbsDNqDth6R7o85vYWK4kbP6CT8MPVBawu8+fCcx6ioyIuRxkD00GX\nEtpN09C0N3/jcm4B6c7ZwNLkip6pFdGXunkJa8RFb5dHlhoLoGEHTDW8yz9/s5k0\nz8tHA4vHGS0ftoURGAymtBw28QKBgQDSY7+YClIDr+RjCyuEPay39QCShH6l8t/m\nO7T805nEQ6eednjKBSSbU65DYItAsierG4u7JafXNJAOPa/fgTeDMZm1fSk+CZct\nkwaw+drG6kJucxjWWLXZ1s9WYoIbU6fJkag4573irKsJENpFQMmxkSphsOxiYECV\n33oIkemF4wKBgQCoTopv2XjfiS7UaiWBDS7D/24YFeWCbSk44BI4toLqtzjpJkZq\nHjO4X7dofAZmh7apnCghm/qXG7S8cj2IAgpa7AJI8jI6AZ1Etlg1ovyWeYaIthgc\nm65QWeg8PKMnf2uPpCOia7TWshXU9THE7E6Fbm/8G/ithF+++m3LKBZoAQKBgC9Z\n3986Q2ctCTv5YZvrvZnRfIV9aHu1BAtvWLamcS8pAuq5Q0pEig6jcM8dRXoUHrV2\nB6bhPLtEyz9JRvIIxROz8CJWvxeFVQ8ezhy6vzCRvM3a/bYQVS1oGVYZ6ap404Sc\nUb4s+iGwNvZdYqK/iCV8xIskJK+ndiHFIFQZcvN9AoGBAOAxakE2rtulkL2O4NMx\nXPV4pAYaKFVFAYQyPSIbCzFXNlQP4/b7yDmZFe62LLZxJgwCIBH3tx4572nAUKX9\nXMp3TqkjMF+zPSVEUrmbL+V0PZMhbcpyP+dwlP4zjTuURKcCzTr0oJcCGrFasUKp\nAYDqdUvywmSqrCyhy52h1pkB\n-----END PRIVATE KEY-----\n"
+  };
+  const FOLDER_IDS = {
+    media:     "1p5xPe7AlUliuRg_xnVspdctq4LHm0mWK",
+    events:    "10yuZBWnfVkakhOKmBdGsFiMDOix4FVY7",
+    marketing: "1x462RrQuiYnU0FD9pjqqz-guJe49UyLp"
+  };
+  const SHEET_ID = "1h1lXqQ5SBhAWUBlvGpB9IkfByX8rLX0lmRwBG48mKcY";
+
+  // ── QUOTES ───────────────────────────────────────────────────────
+  const quotes = [
+    "A team that delivers is a team that endures. Your work today builds the legacy of tomorrow.",
+    "Greatness is not given — it is submitted, one task at a time.",
+    "Every file you upload is a brick in the monument we are building together.",
+    "Discipline is the bridge between who we are and who we are meant to become.",
+    "The Titans do not wait for the right moment. They create it.",
+    "Small acts of commitment, done consistently, produce extraordinary results.",
+    "Your contribution is not just a task — it is a declaration of who you are.",
+    "We rise together, or we do not rise at all. Submit your work. Hold the standard."
+  ];
+  function pickQuote() {
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('rotatingQuote').textContent = "\u201C" + q + "\u201D";
+    const rest = quotes.filter(x => x !== q);
+    const f = rest[Math.floor(Math.random() * rest.length)];
+    document.getElementById('footerQuote').textContent = "\u201C" + f.split('.')[0] + ".\u201D";
+  }
+  pickQuote();
+
+  // ── ELEMENTS ─────────────────────────────────────────────────────
+  const fileInput     = document.getElementById('fileInput');
+  const uploadZone    = document.getElementById('uploadZone');
+  const fileChosen    = document.getElementById('fileChosen');
+  const fileNameEl    = document.getElementById('fileName');
+  const fileRemoveBtn = document.getElementById('fileRemove');
+
+  // File selected via inline onchange handler (global fn above)
+  // Drag & drop on the zone
+  let dragDepth = 0;
+  uploadZone.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
+  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); dragDepth = 0; uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+  });
+
+  function setFile(f) {
+    window._selectedFile = f;
+    fileNameEl.textContent = f.name;
+    fileChosen.classList.add('visible');
+    clearError('fieldFile');
+  }
+
+  fileRemoveBtn.addEventListener('click', () => {
+    window._selectedFile = null;
+    fileInput.value = '';
+    fileChosen.classList.remove('visible');
+    fileNameEl.textContent = '';
+  });
+
+  // ── HELPERS ──────────────────────────────────────────────────────
+  function setError(id, show) { document.getElementById(id).classList[show ? 'add' : 'remove']('error'); }
+  function clearError(id)     { document.getElementById(id).classList.remove('error'); }
+
+  function setStatus(msg, pct, isError) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg;
+    el.classList.toggle('is-error', !!isError);
+    document.getElementById('progressWrap').classList.add('visible');
+    if (pct !== undefined) document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  // ── GOOGLE AUTH ──────────────────────────────────────────────────
+  async function getAccessToken() {
+    const now = Math.floor(Date.now() / 1000);
+    const privateKey = await importPKCS8(SERVICE_ACCOUNT.private_key, 'RS256');
+    const jwt = await new SignJWT({
+      iss:   SERVICE_ACCOUNT.client_email,
+      scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets',
+      aud:   'https://oauth2.googleapis.com/token',
+      iat: now, exp: now + 3600
+    }).setProtectedHeader({ alg: 'RS256', kid: SERVICE_ACCOUNT.private_key_id }).sign(privateKey);
+
+    const res  = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error('Auth failed: ' + JSON.stringify(data));
+    return data.access_token;
+  }
+
+  // ── UPLOAD TO DRIVE ──────────────────────────────────────────────
+  async function uploadToDrive(token, file, folderId, memberName) {
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const ext       = file.name.includes('.') ? '.' + file.name.split('.').pop() : '';
+    const fileName  = `${memberName} — ${timestamp}${ext}`;
+    const metadata  = JSON.stringify({ name: fileName, parents: [folderId] });
+    const form      = new FormData();
+    form.append('metadata', new Blob([metadata], { type: 'application/json' }));
+    form.append('file', file);
+    const res  = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',
+      { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
+    );
+    const data = await res.json();
+    if (!data.id) throw new Error('Drive upload failed: ' + JSON.stringify(data));
+    return data;
+  }
+
+  // ── LOG TO SHEET ─────────────────────────────────────────────────
+  async function logToSheet(token, name, committee, fileLink, fileName) {
+    const now     = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+      {
+        method:  'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ values: [[name, committee, fileName, fileLink, dateStr, timeStr]] })
+      }
+    );
+  }
+
+  // ── SUBMIT ───────────────────────────────────────────────────────
+  async function handleSubmit() {
+    const name      = document.getElementById('memberName').value.trim();
+    const committee = document.getElementById('committee').value;
+    let valid = true;
+    if (!name)         { setError('fieldName',      true); valid = false; } else setError('fieldName',      false);
+    if (!committee)    { setError('fieldCommittee', true); valid = false; } else setError('fieldCommittee', false);
+    if (!window._selectedFile) { setError('fieldFile', true); valid = false; } else setError('fieldFile', false);
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting\u2026';
+
+    try {
+      setStatus('Authenticating\u2026', 15);
+      const token = await getAccessToken();
+
+      setStatus('Uploading file to Drive\u2026', 45);
+      const uploaded = await uploadToDrive(token, window._selectedFile, FOLDER_IDS[committee], name);
+
+      setStatus('Logging submission\u2026', 80);
+      const committeeLabel = document.getElementById('committee').selectedOptions[0].text;
+      await logToSheet(token, name, committeeLabel, uploaded.webViewLink, window._selectedFile.name);
+
+      setStatus('Done.', 100);
+      await new Promise(r => setTimeout(r, 500));
+
+      document.getElementById('successDetail').textContent = name + ' \u00B7 ' + committeeLabel;
+      document.getElementById('formContent').classList.add('hidden');
+      document.getElementById('successOverlay').classList.add('visible');
+
+    } catch (err) {
+      setStatus('\u26A0\uFE0F ' + err.message, undefined, true);
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = 'Submit Task';
+    }
+  }
+
+  // ── RESET ────────────────────────────────────────────────────────
+  function resetForm() {
+    document.getElementById('memberName').value = '';
+    document.getElementById('committee').value  = '';
+    window._selectedFile = null;
+    fileChosen.classList.remove('visible');
+    fileNameEl.textContent = '';
+    ['fieldName', 'fieldCommittee', 'fieldFile'].forEach(id => setError(id, false));
+    document.getElementById('formContent').classList.remove('hidden');
+    document.getElementById('successOverlay').classList.remove('visible');
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('progressBar').style.width = '0%';
+    const sm = document.getElementById('statusMsg');
+    sm.textContent = '';
+    sm.classList.remove('is-error');
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Submit Task';
+    pickQuote();
+  }
+
+  // ── INLINE VALIDATION ────────────────────────────────────────────
+  document.getElementById('memberName').addEventListener('input',  () => clearError('fieldName'));
+  document.getElementById('committee').addEventListener('change',  () => clearError('fieldCommittee'));
+  document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+  document.getElementById('btnAgain').addEventListener('click', resetForm);
+</script>
+</body>
+</html> 0; }
   :root {
     --gold: #C9A84C; --gold-light: #E8CC7A; --gold-dim: #8B6B2A; --gold-pale: #F5E8C0;
     --crimson: #8B0000; --crimson-deep: #5C0000; --crimson-bright: #B30000;
