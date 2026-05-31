@@ -53,9 +53,12 @@
   .field-divider { display: flex; align-items: center; gap: 16px; margin: 36px 0; }
   .field-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
   .field-divider .diamond-sm { width: 5px; height: 5px; background: #8B0000; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 6px rgba(139,0,0,0.6); }
+
+  /* ── Upload zone: file input is OUTSIDE the zone, triggered by click ── */
   .upload-zone { width: 100%; min-height: 160px; border: 1px dashed var(--border-strong); border-radius: 2px; background: var(--surface-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: border-color 0.25s, background 0.25s; position: relative; overflow: hidden; }
   .upload-zone:hover, .upload-zone.dragover { border-color: var(--gold); background: rgba(139,0,0,0.06); box-shadow: inset 0 0 30px rgba(139,0,0,0.08); }
-  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  /* Hidden file input — NOT inside the zone to avoid event conflicts */
+  #fileInput { display: none; }
   .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; transition: stroke 0.25s; }
   .upload-zone:hover .upload-icon { stroke: var(--gold); }
   .upload-label { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; transition: color 0.25s; }
@@ -123,6 +126,9 @@
     <p class="quote-attr">— Hesham Yasser, President of the Titans</p>
   </div>
 
+  <!-- Hidden file input lives OUTSIDE the upload zone to avoid event conflicts -->
+  <input type="file" id="fileInput" accept="*/*" style="display:none;" />
+
   <div class="card" id="mainCard">
     <div class="inner-corner-tr"></div>
     <div class="inner-corner-bl"></div>
@@ -155,8 +161,8 @@
       <div class="field" id="fieldFile">
         <label>Task File</label>
         <p class="field-hint">Drop your file here, or click to browse</p>
+        <!-- Upload zone: clicking it triggers the hidden file input programmatically -->
         <div class="upload-zone" id="uploadZone">
-          <input type="file" id="fileInput" accept="*/*"/>
           <svg class="upload-icon" viewBox="0 0 24 24">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17 8 12 3 7 8"/>
@@ -171,13 +177,14 @@
             <polyline points="14 2 14 8 20 8"/>
           </svg>
           <span class="file-name" id="fileName">filename.pdf</span>
-          <button class="file-remove" id="fileRemove" title="Remove file">×</button>
+          <button class="file-remove" id="fileRemove" type="button" title="Remove file">×</button>
         </div>
         <p class="error-msg">Please attach a file to submit.</p>
       </div>
 
       <div class="submit-wrap">
-        <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Submit Task</button>
+        <!-- FIX: removed inline onclick; event bound in JS after module loads -->
+        <button class="btn-submit" id="submitBtn" type="button">Submit Task</button>
         <div class="progress-bar-wrap" id="progressWrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -196,7 +203,7 @@
         <span id="successDetail" style="color: var(--gold-pale);"></span>
       </p>
       <a class="success-sheet-link" href="https://docs.google.com/spreadsheets/d/1h1lXqQ5SBhAWUBlvGpB9IkfByX8rLX0lmRwBG48mKcY/edit" target="_blank">View Submissions Sheet</a>
-      <button class="btn-again" onclick="resetForm()">Submit Another Task</button>
+      <button class="btn-again" id="btnAgain" type="button">Submit Another Task</button>
     </div>
   </div>
 
@@ -206,9 +213,9 @@
   </footer>
 </div>
 
+<!-- Single module script — no second script block to avoid overwriting listeners -->
 <script type="module">
-  // ── JOSE IMPORT ─────────────────────────────────────────────────
-  const { SignJWT, importPKCS8 } = await import("https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js");
+  import { SignJWT, importPKCS8 } from "https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js";
 
   // ── CONFIG ──────────────────────────────────────────────────────
   const SERVICE_ACCOUNT = {
@@ -247,28 +254,54 @@
   pickQuote();
 
   // ── FILE HANDLING ────────────────────────────────────────────────
-  const fileInput = document.getElementById('fileInput');
+  // FIX: file input is outside the zone; zone click triggers it programmatically.
+  // This eliminates all event-bubbling conflicts between the zone and the input.
+  const fileInput  = document.getElementById('fileInput');
   const uploadZone = document.getElementById('uploadZone');
   const fileChosen = document.getElementById('fileChosen');
   const fileNameEl = document.getElementById('fileName');
   const fileRemoveBtn = document.getElementById('fileRemove');
   let selectedFile = null;
 
-  fileInput.addEventListener('change', function() { if (this.files && this.files[0]) setFile(this.files[0]); });
-  fileInput.addEventListener('input', function() { if (this.files && this.files[0]) setFile(this.files[0]); });
+  // Clicking the zone opens the file picker
+  uploadZone.addEventListener('click', () => fileInput.click());
+
+  // FIX: single authoritative 'change' listener on the input — no duplication
+  fileInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) setFile(this.files[0]);
+  });
+
+  // Drag & drop
   uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
   uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-  uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+  });
 
-  function setFile(f) { selectedFile = f; fileNameEl.textContent = f.name; fileChosen.classList.add('visible'); clearError('fieldFile'); }
-  fileRemoveBtn.addEventListener('click', () => { selectedFile = null; fileInput.value = ''; fileChosen.classList.remove('visible'); });
+  function setFile(f) {
+    selectedFile = f;
+    fileNameEl.textContent = f.name;
+    fileChosen.classList.add('visible');
+    clearError('fieldFile');
+  }
 
+  fileRemoveBtn.addEventListener('click', () => {
+    selectedFile = null;
+    fileInput.value = '';
+    fileChosen.classList.remove('visible');
+  });
+
+  // ── HELPERS ──────────────────────────────────────────────────────
   function setError(id, show) { document.getElementById(id).classList[show ? 'add' : 'remove']('error'); }
-  function clearError(id) { document.getElementById(id).classList.remove('error'); }
+  function clearError(id)     { document.getElementById(id).classList.remove('error'); }
+
   function setStatus(msg, pct) {
     document.getElementById('statusMsg').textContent = msg;
+    // FIX: always show the progress bar when setStatus is called
+    document.getElementById('progressWrap').classList.add('visible');
     if (pct !== undefined) {
-      document.getElementById('progressWrap').classList.add('visible');
       document.getElementById('progressBar').style.width = pct + '%';
     }
   }
@@ -298,7 +331,7 @@
 
   // ── UPLOAD TO DRIVE ──────────────────────────────────────────────
   async function uploadToDrive(token, file, folderId, memberName) {
-    const timestamp = new Date().toISOString().slice(0,10);
+    const timestamp = new Date().toISOString().slice(0, 10);
     const ext = file.name.includes('.') ? '.' + file.name.split('.').pop() : '';
     const fileName = `${memberName} — ${timestamp}${ext}`;
 
@@ -320,11 +353,10 @@
   // ── LOG TO SHEET ─────────────────────────────────────────────────
   async function logToSheet(token, name, committee, fileLink, fileName) {
     const now = new Date();
-    const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-    const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     const row = [[name, committee, fileName, fileLink, dateStr, timeStr]];
 
-    // Ensure header row exists first
     const checkRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:F1`, {
       headers: { Authorization: 'Bearer ' + token }
     });
@@ -346,13 +378,13 @@
 
   // ── MAIN SUBMIT ──────────────────────────────────────────────────
   async function handleSubmit() {
-    const name = document.getElementById('memberName').value.trim();
+    const name      = document.getElementById('memberName').value.trim();
     const committee = document.getElementById('committee').value;
     let valid = true;
 
-    if (!name) { setError('fieldName', true); valid = false; } else setError('fieldName', false);
+    if (!name)      { setError('fieldName',      true); valid = false; } else setError('fieldName',      false);
     if (!committee) { setError('fieldCommittee', true); valid = false; } else setError('fieldCommittee', false);
-    if (!selectedFile) { setError('fieldFile', true); valid = false; } else setError('fieldFile', false);
+    if (!selectedFile) { setError('fieldFile',   true); valid = false; } else setError('fieldFile',      false);
     if (!valid) return;
 
     const btn = document.getElementById('submitBtn');
@@ -390,9 +422,10 @@
   function resetForm() {
     document.getElementById('memberName').value = '';
     document.getElementById('committee').value = '';
-    selectedFile = null; fileInput.value = '';
+    selectedFile = null;
+    fileInput.value = '';
     fileChosen.classList.remove('visible');
-    ['fieldName','fieldCommittee','fieldFile'].forEach(id => setError(id, false));
+    ['fieldName', 'fieldCommittee', 'fieldFile'].forEach(id => setError(id, false));
     document.getElementById('formContent').style.display = 'block';
     document.getElementById('successOverlay').classList.remove('visible');
     document.getElementById('progressWrap').classList.remove('visible');
@@ -401,23 +434,13 @@
     pickQuote();
   }
 
-  document.getElementById('memberName').addEventListener('input', () => clearError('fieldName'));
-  document.getElementById('committee').addEventListener('change', () => clearError('fieldCommittee'));
+  // ── INLINE VALIDATION CLEAR ──────────────────────────────────────
+  document.getElementById('memberName').addEventListener('input',  () => clearError('fieldName'));
+  document.getElementById('committee').addEventListener('change',  () => clearError('fieldCommittee'));
 
-  window.handleSubmit = handleSubmit;
-  window.resetForm = resetForm;
-  window._setFile = setFile;
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var fi = document.getElementById('fileInput');
-    var uz = document.getElementById('uploadZone');
-    if (fi) {
-      fi.onchange = function() {
-        if (this.files && this.files[0]) window._setFile(this.files[0]);
-      };
-    }
-  });
+  // FIX: bind submit and reset directly in the module after everything is ready
+  document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+  document.getElementById('btnAgain').addEventListener('click',  resetForm);
 </script>
 </body>
 </html>
