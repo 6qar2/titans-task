@@ -31,39 +31,9 @@
   .divider-line { height: 1px; width: 60px; background: linear-gradient(90deg, transparent, var(--gold-dim)); }
   .divider-line.r { background: linear-gradient(90deg, var(--gold-dim), transparent); }
   .divider-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(201,168,76,0.5); }
-
-  /* ── QUOTE BLOCK — fixed visibility ── */
-  .quote-block {
-    width: 100%; max-width: 620px; text-align: left; margin-bottom: 36px;
-    animation: fadeUp 1s ease 0.1s both;
-    border-left: 2px solid #B30000;
-    padding: 18px 24px;
-    background: rgba(139,0,0,0.10);
-    border-radius: 0 2px 2px 0;
-    box-shadow: -4px 0 24px rgba(139,0,0,0.25), inset 0 0 40px rgba(139,0,0,0.05);
-  }
-  .quote-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 19px;
-    font-weight: 400;
-    /* FIX: was 0.6 opacity — bumped to fully opaque gold-pale so it's actually readable */
-    color: var(--gold-pale);
-    line-height: 1.75;
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  }
-  .quote-attr {
-    margin-top: 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 9.5px;
-    letter-spacing: 0.35em;
-    /* FIX: was gold-dim (very dark) — now gold so it's visible */
-    color: var(--gold);
-    text-transform: uppercase;
-    opacity: 0.75;
-  }
-
+  .quote-block { width: 100%; max-width: 620px; text-align: left; margin-bottom: 36px; animation: fadeUp 1s ease 0.1s both; border-left: 2px solid #B30000; padding: 18px 24px; background: rgba(139,0,0,0.10); border-radius: 0 2px 2px 0; box-shadow: -4px 0 24px rgba(139,0,0,0.25), inset 0 0 40px rgba(139,0,0,0.05); }
+  .quote-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; font-weight: 400; color: var(--gold-pale); line-height: 1.75; letter-spacing: 0.02em; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+  .quote-attr { margin-top: 14px; font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: 0.35em; color: var(--gold); text-transform: uppercase; opacity: 0.75; }
   .card { width: 100%; max-width: 620px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid #8B0000; border-radius: 2px; padding: 52px 52px 56px; position: relative; animation: fadeUp 1s ease 0.2s both; box-shadow: 0 0 0 1px rgba(201,168,76,0.04), 0 40px 80px rgba(0,0,0,0.6), -8px 0 40px rgba(139,0,0,0.25), inset 0 1px 0 rgba(201,168,76,0.08); }
   .card::before, .card::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--gold-dim); border-style: solid; }
   .card::before { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
@@ -83,53 +53,21 @@
   .field-divider { display: flex; align-items: center; gap: 16px; margin: 36px 0; }
   .field-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
   .field-divider .diamond-sm { width: 5px; height: 5px; background: #8B0000; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 6px rgba(139,0,0,0.6); }
-
-  /* ── UPLOAD ZONE ── */
-  .upload-zone {
-    width: 100%; min-height: 160px;
-    border: 1px dashed var(--border-strong); border-radius: 2px;
-    background: var(--surface-2);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
-    user-select: none;
-  }
-  .upload-zone.dragover {
-    border-color: var(--gold);
-    background: rgba(139,0,0,0.06);
-    box-shadow: inset 0 0 30px rgba(139,0,0,0.08);
-  }
-  .field.error .upload-zone {
-    border-color: rgba(200, 40, 40, 0.6);
-    box-shadow: inset 0 0 16px rgba(200,0,0,0.07);
-  }
+  .upload-zone { width: 100%; min-height: 160px; border: 1px dashed var(--border-strong); border-radius: 2px; background: var(--surface-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: border-color 0.25s, background 0.25s, box-shadow 0.25s; user-select: none; }
+  .upload-zone.dragover { border-color: var(--gold); background: rgba(139,0,0,0.06); box-shadow: inset 0 0 30px rgba(139,0,0,0.08); }
+  .field.error .upload-zone { border-color: rgba(200, 40, 40, 0.6); box-shadow: inset 0 0 16px rgba(200,0,0,0.07); }
   .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; }
   .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; }
   .upload-types { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; }
-  .btn-browse {
-    margin-top: 4px;
-    background: none;
-    border: 1px solid var(--border-strong);
-    color: var(--gold);
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    padding: 10px 24px;
-    cursor: pointer;
-    border-radius: 1px;
-    transition: all 0.25s;
-  }
+  .btn-browse { margin-top: 4px; background: none; border: 1px solid var(--border-strong); color: var(--gold); font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; padding: 10px 24px; cursor: pointer; border-radius: 1px; transition: all 0.25s; }
   .btn-browse:hover { border-color: var(--gold); background: rgba(201,168,76,0.07); }
-  /* position off-screen — display:none blocks programmatic .click() */
   #fileInput { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
-
   .file-chosen { display: none; align-items: center; gap: 14px; padding: 16px 20px; background: rgba(139,0,0,0.15); border: 1px solid rgba(139,0,0,0.3); border-radius: 2px; margin-top: 12px; }
   .file-chosen.visible { display: flex; }
   .file-icon { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 1.5; flex-shrink: 0; }
   .file-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--gold-pale); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .file-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 4px 6px; transition: color 0.2s; }
   .file-remove:hover { color: var(--crimson-bright); }
-
   .submit-wrap { margin-top: 44px; }
   .btn-submit { width: 100%; height: 56px; background: linear-gradient(135deg, var(--crimson-deep) 0%, var(--crimson) 50%, var(--crimson-deep) 100%); border: 1px solid rgba(201,168,76,0.25); border-radius: 1px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); transition: all 0.3s; position: relative; overflow: hidden; }
   .btn-submit:hover:not(:disabled) { border-color: var(--gold-dim); box-shadow: 0 0 30px rgba(139,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.15); transform: translateY(-1px); }
@@ -140,14 +78,11 @@
   .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8B0000, #C9A84C); transition: width 0.4s ease; }
   .status-msg { margin-top: 14px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: var(--text-muted); text-align: center; min-height: 20px; transition: color 0.2s; }
   .status-msg.is-error { color: rgba(255, 100, 100, 0.9); }
-
   .success-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 40px 0; }
   .success-overlay.visible { display: flex; }
   .success-icon { width: 56px; height: 56px; stroke: var(--gold); fill: none; stroke-width: 1.2; filter: drop-shadow(0 0 12px rgba(201,168,76,0.4)); }
   .success-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600; letter-spacing: 0.2em; color: var(--gold); }
   .success-msg { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--text-muted); line-height: 1.6; }
-  .success-sheet-link { display: inline-block; margin-top: 8px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-decoration: none; border-bottom: 1px solid rgba(201,168,76,0.2); padding-bottom: 2px; text-transform: uppercase; transition: color 0.2s; }
-  .success-sheet-link:hover { color: var(--gold); }
   .btn-again { margin-top: 8px; background: none; border: 1px solid var(--border-strong); color: var(--gold-dim); font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; padding: 12px 28px; cursor: pointer; border-radius: 1px; transition: all 0.25s; }
   .btn-again:hover { border-color: var(--gold); color: var(--gold); }
   .footer { margin-top: 52px; text-align: center; animation: fadeUp 1.2s ease 0.4s both; }
@@ -222,25 +157,17 @@
       <div class="field" id="fieldFile">
         <label class="field-label">Task File</label>
         <p class="field-hint">Drop your file here, or click to browse</p>
-
-        <!--
-          FIX: The file input now overlays the full wrapper at full size (opacity:0).
-          This is the most reliable cross-browser pattern — no more zero-size tricks.
-          The visual drop zone has pointer-events:none so the input above captures everything.
-        -->
         <div class="upload-zone" id="uploadZone">
-            <svg class="upload-icon" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <span class="upload-text">Drag &amp; drop your file here</span>
-            <span class="upload-types">PDF · Image · Document · Any format</span>
-            <label for="fileInput" class="btn-browse">Browse Files</label>
-          </div>
-          <input type="file" id="fileInput" style="display:none;" onchange="handleFileChange(this)" />
+          <svg class="upload-icon" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span class="upload-text">Drag &amp; drop your file here</span>
+          <span class="upload-types">PDF · Image · Document · Any format</span>
+          <label for="fileInput" class="btn-browse">Browse Files</label>
         </div>
-
+        <input type="file" id="fileInput" style="display:none;" onchange="handleFileChange(this)" />
         <div class="file-chosen" id="fileChosen">
           <svg class="file-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -268,10 +195,9 @@
       </svg>
       <p class="success-title">Task Received</p>
       <p class="success-msg">
-        Your submission has been saved to Drive.<br>
+        Your submission has been delivered to the Titans.<br>
         <span id="successDetail" style="color: var(--gold-pale);"></span>
       </p>
-      <a class="success-sheet-link" href="https://docs.google.com/spreadsheets/d/1h1lXqQ5SBhAWUBlvGpB9IkfByX8rLX0lmRwBG48mKcY/edit" target="_blank">View Submissions Sheet</a>
       <button class="btn-again" id="btnAgain" type="button">Submit Another Task</button>
     </div>
   </div>
@@ -285,27 +211,14 @@
 <script>
   function handleFileChange(input) {
     if (!input.files || !input.files[0]) return;
-    const f = input.files[0];
-    document.getElementById('fileName').textContent = f.name;
-    document.getElementById('fileChosen').classList.add('visible');
-    document.getElementById('fieldFile').classList.remove('error');
-    window._selectedFile = f;
+    setFile(input.files[0]);
   }
 </script>
 <script>
 
-  // ── CONFIG ───────────────────────────────────────────────────────
-  const SERVICE_ACCOUNT = {
-    client_email: "titans-uploader@titans-club.iam.gserviceaccount.com",
-    private_key_id: "fbf9f115c4b70e1bbc959afaaff5a3f97eedf6dd",
-    private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDHfvy1guN+X9WN\nK9CNDode6L2hY6/3uEr7qsP/c7BUpGMTy9525cf6bgcr6YhsAMR+pZPP3GgWKCsY\nssCny6if4DGuhVriZ/vv4PQVizUKJOi2cS4+qb1dTjnHAJE7nY0PjlOTqZ0gjEAp\n6SuaBRdXeE8q2wFoaKO4ypjodWiJq61Za3hrbwE3GBnxoJpxLNef0YXbp1S/8+r3\nyggPiZKGwc8fK/qYmt2oSYkuOYHUfETsNjjNLtudIOac0Onkd8Nu/JEltUf//VoC\nFl4GMJMDr+XCF50mqEejubB9H88MZWTSgfsKQJ4+5zhrjUicX7oMDmL71Xprxsqj\nTbjf6OyzAgMBAAECggEAFQAuNCFiN2R5Q5IwMxkrcPdJNxsaZBZ3dkTEuzh/gHmJ\noITel1+bDKbWhG3iGZR/GuHtTH1kS6jQ2JnApClRR/s+36NULO9LWzYwG7B61eWK\nxeHmP1x4/cCFXoiVwVPVjKSr8ahyTQHWo1LTbzRH/8I/e0Bwxn/1dDeHnzj010EW\nm+vQmX7VGAScAeJhAIrd4w9BHfvOQoT2Y3QzwjF9ati2HST398pPwFzml3d4WIDG\nrydQ2AaRcBaAPnU4W2dP/IMROdpQl6XhPAPV+mX+YE8u8F/sS72ErqFmnZZgfckA\nDqGG8ZZLX8Er8IhL8PVYJmsYPTIPc0taaPPb8+IxoQKBgQDyvqnQ9++8OcVlGTSG\nakZoGj4mPgDbsDNqDth6R7o85vYWK4kbP6CT8MPVBawu8+fCcx6ioyIuRxkD00GX\nEtpN09C0N3/jcm4B6c7ZwNLkip6pFdGXunkJa8RFb5dHlhoLoGEHTDW8yz9/s5k0\nz8tHA4vHGS0ftoURGAymtBw28QKBgQDSY7+YClIDr+RjCyuEPay39QCShH6l8t/m\nO7T805nEQ6eednjKBSSbU65DYItAsierG4u7JafXNJAOPa/fgTeDMZm1fSk+CZct\nkwaw+drG6kJucxjWWLXZ1s9WYoIbU6fJkag4573irKsJENpFQMmxkSphsOxiYECV\n33oIkemF4wKBgQCoTopv2XjfiS7UaiWBDS7D/24YFeWCbSk44BI4toLqtzjpJkZq\nHjO4X7dofAZmh7apnCghm/qXG7S8cj2IAgpa7AJI8jI6AZ1Etlg1ovyWeYaIthgc\nm65QWeg8PKMnf2uPpCOia7TWshXU9THE7E6Fbm/8G/ithF+++m3LKBZoAQKBgC9Z\n3986Q2ctCTv5YZvrvZnRfIV9aHu1BAtvWLamcS8pAuq5Q0pEig6jcM8dRXoUHrV2\nB6bhPLtEyz9JRvIIxROz8CJWvxeFVQ8ezhy6vzCRvM3a/bYQVS1oGVYZ6ap404Sc\nUb4s+iGwNvZdYqK/iCV8xIskJK+ndiHFIFQZcvN9AoGBAOAxakE2rtulkL2O4NMx\nXPV4pAYaKFVFAYQyPSIbCzFXNlQP4/b7yDmZFe62LLZxJgwCIBH3tx4572nAUKX9\nXMp3TqkjMF+zPSVEUrmbL+V0PZMhbcpyP+dwlP4zjTuURKcCzTr0oJcCGrFasUKp\nAYDqdUvywmSqrCyhy52h1pkB\n-----END PRIVATE KEY-----\n"
-  };
-  const FOLDER_IDS = {
-    media:     "1jGg_aPVP0FT2904Lawl48EeXrXINwX3T",
-    events:    "15qYC7_rVBO9fnFmI496GXiR41TI9czT4",
-    marketing: "18nAAUKXy88jjuzSEJq8ngK9w88CRx5FJ"
-  };
-  const SHEET_ID = "1h1lXqQ5SBhAWUBlvGpB9IkfByX8rLX0lmRwBG48mKcY";
+  // ── TELEGRAM CONFIG ──────────────────────────────────────────────
+  const TG_TOKEN   = '8609163842:AAEShkRbnOhu5h8ZD5KyYdYa_zu37ra0Yi0';
+  const TG_CHAT_ID = '-5251479365';
 
   // ── QUOTES ───────────────────────────────────────────────────────
   const quotes = [
@@ -334,8 +247,6 @@
   const fileNameEl    = document.getElementById('fileName');
   const fileRemoveBtn = document.getElementById('fileRemove');
 
-  // File selected via inline onchange handler (global fn above)
-  // Drag & drop on the zone
   let dragDepth = 0;
   uploadZone.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
   uploadZone.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
@@ -371,82 +282,37 @@
     if (pct !== undefined) document.getElementById('progressBar').style.width = pct + '%';
   }
 
-  // ── GOOGLE AUTH ──────────────────────────────────────────────────
-  async function getAccessToken() {
-    const now = Math.floor(Date.now() / 1000);
-    const header  = { alg: 'RS256', typ: 'JWT', kid: SERVICE_ACCOUNT.private_key_id };
-    const payload = {
-      iss:   SERVICE_ACCOUNT.client_email,
-      scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets',
-      aud:   'https://oauth2.googleapis.com/token',
-      iat: now, exp: now + 3600
-    };
-    const b64 = s => btoa(unescape(encodeURIComponent(JSON.stringify(s)))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const signingInput = b64(header) + '.' + b64(payload);
+  // ── SEND TO TELEGRAM ─────────────────────────────────────────────
+  async function sendToTelegram(name, committee, file) {
+    const now       = new Date();
+    const dateStr   = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr   = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const caption   = `📋 *New Task Submission*\n\n👤 *Name:* ${name}\n🏛 *Committee:* ${committee}\n📁 *File:* ${file.name}\n📅 *Date:* ${dateStr} at ${timeStr}`;
 
-    // Import the private key using WebCrypto
-    const pemBody = SERVICE_ACCOUNT.private_key.replace(/-----[^-]+-----/g,'').replace(/\s/g,'');
-    const keyData = Uint8Array.from(atob(pemBody), c => c.charCodeAt(0));
-    const cryptoKey = await crypto.subtle.importKey(
-      'pkcs8', keyData.buffer,
-      { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-      false, ['sign']
-    );
-    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, new TextEncoder().encode(signingInput));
-    const jwt = signingInput + '.' + btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    const form = new FormData();
+    form.append('chat_id', TG_CHAT_ID);
+    form.append('caption', caption);
+    form.append('parse_mode', 'Markdown');
+    form.append('document', file, file.name);
 
-    const res  = await fetch('https://oauth2.googleapis.com/token', {
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+      body: form
     });
     const data = await res.json();
-    if (!data.access_token) throw new Error('Auth failed: ' + JSON.stringify(data));
-    return data.access_token;
-  }
-
-  // ── UPLOAD TO DRIVE ──────────────────────────────────────────────
-  async function uploadToDrive(token, file, folderId, memberName) {
-    const timestamp = new Date().toISOString().slice(0, 10);
-    const ext       = file.name.includes('.') ? '.' + file.name.split('.').pop() : '';
-    const fileName  = `${memberName} — ${timestamp}${ext}`;
-    const metadata  = JSON.stringify({ name: fileName, parents: [folderId] });
-    const form      = new FormData();
-    form.append('metadata', new Blob([metadata], { type: 'application/json' }));
-    form.append('file', file);
-    const res  = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,webViewLink',
-      { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
-    );
-    const data = await res.json();
-    if (!data.id) throw new Error('Drive upload failed: ' + JSON.stringify(data));
+    if (!data.ok) throw new Error('Telegram error: ' + (data.description || JSON.stringify(data)));
     return data;
-  }
-
-  // ── LOG TO SHEET ─────────────────────────────────────────────────
-  async function logToSheet(token, name, committee, fileLink, fileName) {
-    const now     = new Date();
-    const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-    await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
-      {
-        method:  'POST',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ values: [[name, committee, fileName, fileLink, dateStr, timeStr]] })
-      }
-    );
   }
 
   // ── SUBMIT ───────────────────────────────────────────────────────
   async function handleSubmit() {
     const name      = document.getElementById('memberName').value.trim();
     const committee = document.getElementById('committee').value;
+    const committeeLabel = committee ? document.getElementById('committee').selectedOptions[0].text : '';
     let valid = true;
-    if (!name)         { setError('fieldName',      true); valid = false; } else setError('fieldName',      false);
-    if (!committee)    { setError('fieldCommittee', true); valid = false; } else setError('fieldCommittee', false);
-    if (!window._selectedFile) { setError('fieldFile', true); valid = false; } else setError('fieldFile', false);
+    if (!name)               { setError('fieldName',      true); valid = false; } else setError('fieldName',      false);
+    if (!committee)          { setError('fieldCommittee', true); valid = false; } else setError('fieldCommittee', false);
+    if (!window._selectedFile) { setError('fieldFile',   true); valid = false; } else setError('fieldFile',      false);
     if (!valid) return;
 
     const btn = document.getElementById('submitBtn');
@@ -454,16 +320,8 @@
     btn.textContent = 'Submitting\u2026';
 
     try {
-      setStatus('Authenticating\u2026', 15);
-      const token = await getAccessToken();
-
-      setStatus('Uploading file to Drive\u2026', 45);
-      const uploaded = await uploadToDrive(token, window._selectedFile, FOLDER_IDS[committee], name);
-
-      setStatus('Logging submission\u2026', 80);
-      const committeeLabel = document.getElementById('committee').selectedOptions[0].text;
-      await logToSheet(token, name, committeeLabel, uploaded.webViewLink, window._selectedFile.name);
-
+      setStatus('Sending to Titans\u2026', 30);
+      await sendToTelegram(name, committeeLabel, window._selectedFile);
       setStatus('Done.', 100);
       await new Promise(r => setTimeout(r, 500));
 
@@ -499,7 +357,7 @@
     pickQuote();
   }
 
-  // ── INLINE VALIDATION ────────────────────────────────────────────
+  // ── LISTENERS ────────────────────────────────────────────────────
   document.getElementById('memberName').addEventListener('input',  () => clearError('fieldName'));
   document.getElementById('committee').addEventListener('change',  () => clearError('fieldCommittee'));
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
