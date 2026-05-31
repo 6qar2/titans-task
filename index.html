@@ -31,9 +31,39 @@
   .divider-line { height: 1px; width: 60px; background: linear-gradient(90deg, transparent, var(--gold-dim)); }
   .divider-line.r { background: linear-gradient(90deg, var(--gold-dim), transparent); }
   .divider-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(201,168,76,0.5); }
-  .quote-block { width: 100%; max-width: 620px; text-align: left; margin-bottom: 36px; animation: fadeUp 1s ease 0.1s both; border-left: 2px solid #8B0000; padding-left: 20px; box-shadow: -4px 0 20px rgba(139,0,0,0.2); }
-  .quote-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; font-weight: 300; color: rgba(245,232,192,0.6); line-height: 1.7; letter-spacing: 0.02em; }
-  .quote-attr { margin-top: 12px; font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: 0.35em; color: var(--gold-dim); text-transform: uppercase; }
+
+  /* ── QUOTE BLOCK — fixed visibility ── */
+  .quote-block {
+    width: 100%; max-width: 620px; text-align: left; margin-bottom: 36px;
+    animation: fadeUp 1s ease 0.1s both;
+    border-left: 2px solid #B30000;
+    padding: 18px 24px;
+    background: rgba(139,0,0,0.10);
+    border-radius: 0 2px 2px 0;
+    box-shadow: -4px 0 24px rgba(139,0,0,0.25), inset 0 0 40px rgba(139,0,0,0.05);
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    font-weight: 400;
+    /* FIX: was 0.6 opacity — bumped to fully opaque gold-pale so it's actually readable */
+    color: var(--gold-pale);
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .quote-attr {
+    margin-top: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 9.5px;
+    letter-spacing: 0.35em;
+    /* FIX: was gold-dim (very dark) — now gold so it's visible */
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
   .card { width: 100%; max-width: 620px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid #8B0000; border-radius: 2px; padding: 52px 52px 56px; position: relative; animation: fadeUp 1s ease 0.2s both; box-shadow: 0 0 0 1px rgba(201,168,76,0.04), 0 40px 80px rgba(0,0,0,0.6), -8px 0 40px rgba(139,0,0,0.25), inset 0 1px 0 rgba(201,168,76,0.08); }
   .card::before, .card::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--gold-dim); border-style: solid; }
   .card::before { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
@@ -54,22 +84,18 @@
   .field-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
   .field-divider .diamond-sm { width: 5px; height: 5px; background: #8B0000; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 6px rgba(139,0,0,0.6); }
 
-  /* ── Upload zone ── */
-  /* Wrapper is the label — clicking anywhere on it opens the file picker natively */
-  .upload-label-wrap {
-    display: block;
+  /* ── UPLOAD ZONE — fully rebuilt ── */
+  /*
+    FIX: The original hid the input with width:0/height:0 inside a <label>.
+    Some browsers/OS combos silently fail when the input has no real dimensions.
+    New approach: real file input overlaid absolutely at full size (opacity:0),
+    sitting above the visual drop zone so every click naturally hits the input.
+    This is the most cross-browser-reliable pattern.
+  */
+  .upload-wrapper {
+    position: relative;
     width: 100%;
     cursor: pointer;
-    /* FIX: establish positioning context so the hidden input stays contained here */
-    position: relative;
-  }
-  /* Hidden input — visually gone, pointer events intact so change fires */
-  .upload-label-wrap input[type="file"] {
-    position: absolute;
-    top: 0; left: 0;
-    width: 0; height: 0;
-    opacity: 0;
-    overflow: hidden;
   }
   .upload-zone {
     width: 100%; min-height: 160px;
@@ -78,29 +104,38 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
     user-select: none;
+    pointer-events: none; /* visual only — input on top captures clicks */
   }
-  .upload-label-wrap:hover .upload-zone,
+  /* The real file input covers the entire upload-wrapper */
+  .upload-wrapper input[type="file"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .upload-wrapper:hover .upload-zone,
   .upload-zone.dragover {
     border-color: var(--gold);
     background: rgba(139,0,0,0.06);
     box-shadow: inset 0 0 30px rgba(139,0,0,0.08);
   }
-  /* FIX: show red outline when file field has an error */
   .field.error .upload-zone {
     border-color: rgba(200, 40, 40, 0.6);
     box-shadow: inset 0 0 16px rgba(200,0,0,0.07);
   }
-  .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; transition: stroke 0.25s; pointer-events: none; }
-  .upload-label-wrap:hover .upload-icon { stroke: var(--gold); }
-  .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; transition: color 0.25s; pointer-events: none; }
-  .upload-label-wrap:hover .upload-text { color: var(--gold-pale); }
-  .upload-types { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; pointer-events: none; }
+  .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; transition: stroke 0.25s; }
+  .upload-wrapper:hover .upload-icon { stroke: var(--gold); }
+  .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; transition: color 0.25s; }
+  .upload-wrapper:hover .upload-text { color: var(--gold-pale); }
+  .upload-types { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; }
 
   .file-chosen { display: none; align-items: center; gap: 14px; padding: 16px 20px; background: rgba(139,0,0,0.15); border: 1px solid rgba(139,0,0,0.3); border-radius: 2px; margin-top: 12px; }
   .file-chosen.visible { display: flex; }
   .file-icon { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 1.5; flex-shrink: 0; }
   .file-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--gold-pale); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  /* FIX: remove button must not be inside the label's click area — it's outside the label in HTML */
   .file-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 4px 6px; transition: color 0.2s; }
   .file-remove:hover { color: var(--crimson-bright); }
 
@@ -112,7 +147,6 @@
   .progress-bar-wrap { margin-top: 16px; height: 2px; background: rgba(201,168,76,0.1); border-radius: 2px; overflow: hidden; display: none; }
   .progress-bar-wrap.visible { display: block; }
   .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8B0000, #C9A84C); transition: width 0.4s ease; }
-  /* FIX: error status gets a distinct red colour so members know something went wrong */
   .status-msg { margin-top: 14px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: var(--text-muted); text-align: center; min-height: 20px; transition: color 0.2s; }
   .status-msg.is-error { color: rgba(255, 100, 100, 0.9); }
 
@@ -126,12 +160,11 @@
   .btn-again { margin-top: 8px; background: none; border: 1px solid var(--border-strong); color: var(--gold-dim); font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; padding: 12px 28px; cursor: pointer; border-radius: 1px; transition: all 0.25s; }
   .btn-again:hover { border-color: var(--gold); color: var(--gold); }
   .footer { margin-top: 52px; text-align: center; animation: fadeUp 1.2s ease 0.4s both; }
-  .footer-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(201,168,76,0.25); margin-bottom: 10px; letter-spacing: 0.03em; }
-  .footer p { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; color: rgba(201,168,76,0.15); text-transform: uppercase; }
+  .footer-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(201,168,76,0.4); margin-bottom: 10px; letter-spacing: 0.03em; }
+  .footer p { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; color: rgba(201,168,76,0.2); text-transform: uppercase; }
   .error-msg { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(255, 80, 80, 0.8); margin-top: 6px; display: none; }
   .field.error input[type="text"], .field.error select { border-color: rgba(200, 40, 40, 0.5); }
   .field.error .error-msg { display: block; }
-  /* FIX: use visibility toggle via class, not inline style, so layout stays correct */
   #formContent { display: block; }
   #formContent.hidden { display: none; }
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -200,11 +233,11 @@
         <p class="field-hint">Drop your file here, or click to browse</p>
 
         <!--
-          The <label for="fileInput"> wraps only the visual drop zone.
-          The file-chosen row (with the × button) is OUTSIDE the label
-          so clicking × never accidentally re-opens the file picker.
+          FIX: The file input now overlays the full wrapper at full size (opacity:0).
+          This is the most reliable cross-browser pattern — no more zero-size tricks.
+          The visual drop zone has pointer-events:none so the input above captures everything.
         -->
-        <label class="upload-label-wrap" for="fileInput">
+        <div class="upload-wrapper" id="uploadWrapper">
           <div class="upload-zone" id="uploadZone">
             <svg class="upload-icon" viewBox="0 0 24 24">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -214,11 +247,9 @@
             <span class="upload-text">Click to select, or drag &amp; drop your file</span>
             <span class="upload-types">PDF · Image · Document · Any format</span>
           </div>
-          <!-- Input inside the label, zero-size, fully interactive -->
-          <input type="file" id="fileInput" accept="*/*" />
-        </label>
+          <input type="file" id="fileInput" />
+        </div>
 
-        <!-- Outside the label — × click won't bubble back to the file picker -->
         <div class="file-chosen" id="fileChosen">
           <svg class="file-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -299,23 +330,25 @@
   // ── ELEMENTS ─────────────────────────────────────────────────────
   const fileInput     = document.getElementById('fileInput');
   const uploadZone    = document.getElementById('uploadZone');
+  const uploadWrapper = document.getElementById('uploadWrapper');
   const fileChosen    = document.getElementById('fileChosen');
   const fileNameEl    = document.getElementById('fileName');
   const fileRemoveBtn = document.getElementById('fileRemove');
   let selectedFile    = null;
 
-  // ── FILE SELECTION ───────────────────────────────────────────────
+  // ── FILE SELECTION via input ─────────────────────────────────────
   fileInput.addEventListener('change', function () {
     if (this.files && this.files[0]) setFile(this.files[0]);
   });
 
   // ── DRAG & DROP ──────────────────────────────────────────────────
-  // FIX: track dragenter depth to prevent flicker when hovering child elements
+  // dragover/drop events go on the wrapper (the input captures the pointer,
+  // but dataTransfer drops still bubble up to the wrapper)
   let dragDepth = 0;
-  uploadZone.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
-  uploadZone.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
-  uploadZone.addEventListener('dragover',  e => e.preventDefault());
-  uploadZone.addEventListener('drop', e => {
+  uploadWrapper.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
+  uploadWrapper.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
+  uploadWrapper.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  uploadWrapper.addEventListener('drop', e => {
     e.preventDefault();
     dragDepth = 0;
     uploadZone.classList.remove('dragover');
@@ -329,7 +362,6 @@
     clearError('fieldFile');
   }
 
-  // FIX: × button is outside the <label> so it can never bubble up and reopen the picker
   fileRemoveBtn.addEventListener('click', () => {
     selectedFile = null;
     fileInput.value = '';
@@ -394,8 +426,6 @@
     const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-    // FIX: removed the unnecessary header-check round-trip — just always append.
-    // The sheet already has headers from when it was created.
     await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
       {
@@ -435,18 +465,15 @@
       await new Promise(r => setTimeout(r, 500));
 
       document.getElementById('successDetail').textContent = name + ' \u00B7 ' + committeeLabel;
-      // FIX: use class toggle instead of inline style so layout is never broken
       document.getElementById('formContent').classList.add('hidden');
       document.getElementById('successOverlay').classList.add('visible');
 
     } catch (err) {
-      // FIX: error message now renders in red so it's clearly not a normal status
       setStatus('\u26A0\uFE0F ' + err.message, undefined, true);
       console.error(err);
       btn.disabled = false;
       btn.textContent = 'Submit Task';
     }
-    // Note: on success we intentionally leave the button disabled (form is hidden anyway)
   }
 
   // ── RESET ────────────────────────────────────────────────────────
@@ -458,7 +485,6 @@
     fileChosen.classList.remove('visible');
     fileNameEl.textContent = '';
     ['fieldName', 'fieldCommittee', 'fieldFile'].forEach(id => setError(id, false));
-    // FIX: class-based toggle — matches how we hide it
     document.getElementById('formContent').classList.remove('hidden');
     document.getElementById('successOverlay').classList.remove('visible');
     document.getElementById('progressWrap').classList.remove('visible');
