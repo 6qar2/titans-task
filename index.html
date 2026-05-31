@@ -254,7 +254,8 @@
   const fileRemoveBtn = document.getElementById('fileRemove');
   let selectedFile = null;
 
-  fileInput.addEventListener('change', function() { if (this.files[0]) setFile(this.files[0]); });
+  fileInput.addEventListener('change', function() { if (this.files && this.files[0]) setFile(this.files[0]); });
+  fileInput.addEventListener('input', function() { if (this.files && this.files[0]) setFile(this.files[0]); });
   uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
   uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
   uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
@@ -405,6 +406,18 @@
 
   window.handleSubmit = handleSubmit;
   window.resetForm = resetForm;
+  window._setFile = setFile;
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var fi = document.getElementById('fileInput');
+    var uz = document.getElementById('uploadZone');
+    if (fi) {
+      fi.onchange = function() {
+        if (this.files && this.files[0]) window._setFile(this.files[0]);
+      };
+    }
+  });
 </script>
 </body>
 </html>
