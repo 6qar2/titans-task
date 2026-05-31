@@ -742,6 +742,37 @@ function setStatus(msg, pct, isError) {
   if (pct !== undefined) document.getElementById('progressBar').style.width = pct + '%';
 }
 
+// ── TELEGRAM WAITING ANIMATOR ─────────────────────────────────────────
+let _waitTimer = null;
+const _waitMessages = [
+  'Sending to the Titans…',
+  'Transmitting your file…',
+  'Still uploading, hang tight…',
+  'On its way…',
+  'Almost there…',
+  'Delivering to the Titans…',
+];
+function startWaitingAnimation() {
+  const bar = document.getElementById('progressBar');
+  const el  = document.getElementById('statusMsg');
+  document.getElementById('progressWrap').classList.add('visible');
+  let elapsed = 0, msgIdx = 0;
+  bar.style.transition = 'none';
+  bar.style.width = '15%';
+  _waitTimer = setInterval(() => {
+    elapsed++;
+    msgIdx = Math.floor(elapsed / 4) % _waitMessages.length;
+    const secs = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed/60) + 'm ' + (elapsed%60) + 's';
+    el.textContent = _waitMessages[msgIdx] + '  (' + secs + ')';
+    const pct = 15 + ((elapsed * 7) % 60);
+    bar.style.transition = 'width 0.9s ease';
+    bar.style.width = pct + '%';
+  }, 1000);
+}
+function stopWaitingAnimation() {
+  if (_waitTimer) { clearInterval(_waitTimer); _waitTimer = null; }
+}
+
 // ── CLOUDINARY CONFIG ─────────────────────────────────────────────────
 const CLD_CLOUD  = 'dzpt864db';
 const CLD_PRESET = 'titans';
@@ -819,8 +850,9 @@ async function handleSubmit() {
   try {
     if (file.size <= TG_LIMIT) {
       // ── Small file: send directly to Telegram ──
-      setStatus('Sending to the Titans\u2026', 30);
+      startWaitingAnimation();
       await sendToTelegramFile(name, committeeLabel, file, dateStr, timeStr);
+      stopWaitingAnimation();
       setStatus('', 100);
     } else {
       // ── Large file: upload to Cloudinary, send link to Telegram ──
