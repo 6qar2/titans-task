@@ -84,19 +84,7 @@
   .field-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
   .field-divider .diamond-sm { width: 5px; height: 5px; background: #8B0000; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 6px rgba(139,0,0,0.6); }
 
-  /* ── UPLOAD ZONE — fully rebuilt ── */
-  /*
-    FIX: The original hid the input with width:0/height:0 inside a <label>.
-    Some browsers/OS combos silently fail when the input has no real dimensions.
-    New approach: real file input overlaid absolutely at full size (opacity:0),
-    sitting above the visual drop zone so every click naturally hits the input.
-    This is the most cross-browser-reliable pattern.
-  */
-  .upload-wrapper {
-    position: relative;
-    width: 100%;
-    cursor: pointer;
-  }
+  /* ── UPLOAD ZONE ── */
   .upload-zone {
     width: 100%; min-height: 160px;
     border: 1px dashed var(--border-strong); border-radius: 2px;
@@ -104,19 +92,7 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
     user-select: none;
-    pointer-events: none; /* visual only — input on top captures clicks */
   }
-  /* The real file input covers the entire upload-wrapper */
-  .upload-wrapper input[type="file"] {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 2;
-  }
-  .upload-wrapper:hover .upload-zone,
   .upload-zone.dragover {
     border-color: var(--gold);
     background: rgba(139,0,0,0.06);
@@ -126,11 +102,26 @@
     border-color: rgba(200, 40, 40, 0.6);
     box-shadow: inset 0 0 16px rgba(200,0,0,0.07);
   }
-  .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; transition: stroke 0.25s; }
-  .upload-wrapper:hover .upload-icon { stroke: var(--gold); }
-  .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; transition: color 0.25s; }
-  .upload-wrapper:hover .upload-text { color: var(--gold-pale); }
+  .upload-icon { width: 36px; height: 36px; stroke: var(--gold-dim); fill: none; stroke-width: 1.2; }
+  .upload-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-muted); font-style: italic; text-align: center; line-height: 1.5; }
   .upload-types { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; }
+  .btn-browse {
+    margin-top: 4px;
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.25s;
+  }
+  .btn-browse:hover { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+  /* position off-screen — display:none blocks programmatic .click() */
+  #fileInput { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
 
   .file-chosen { display: none; align-items: center; gap: 14px; padding: 16px 20px; background: rgba(139,0,0,0.15); border: 1px solid rgba(139,0,0,0.3); border-radius: 2px; margin-top: 12px; }
   .file-chosen.visible { display: flex; }
@@ -237,17 +228,17 @@
           This is the most reliable cross-browser pattern — no more zero-size tricks.
           The visual drop zone has pointer-events:none so the input above captures everything.
         -->
-        <div class="upload-wrapper" id="uploadWrapper">
-          <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone" id="uploadZone">
             <svg class="upload-icon" viewBox="0 0 24 24">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="17 8 12 3 7 8"/>
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            <span class="upload-text">Click to select, or drag &amp; drop your file</span>
+            <span class="upload-text">Drag &amp; drop your file here</span>
             <span class="upload-types">PDF · Image · Document · Any format</span>
+            <label for="fileInput" class="btn-browse">Browse Files</label>
           </div>
-          <input type="file" id="fileInput" />
+          <input type="file" id="fileInput" style="display:none;" onchange="handleFileChange(this)" />
         </div>
 
         <div class="file-chosen" id="fileChosen">
@@ -291,6 +282,16 @@
   </footer>
 </div>
 
+<script>
+  function handleFileChange(input) {
+    if (!input.files || !input.files[0]) return;
+    const f = input.files[0];
+    document.getElementById('fileName').textContent = f.name;
+    document.getElementById('fileChosen').classList.add('visible');
+    document.getElementById('fieldFile').classList.remove('error');
+    window._selectedFile = f;
+  }
+</script>
 <script type="module">
   import { SignJWT, importPKCS8 } from "https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js";
 
@@ -330,40 +331,30 @@
   // ── ELEMENTS ─────────────────────────────────────────────────────
   const fileInput     = document.getElementById('fileInput');
   const uploadZone    = document.getElementById('uploadZone');
-  const uploadWrapper = document.getElementById('uploadWrapper');
   const fileChosen    = document.getElementById('fileChosen');
   const fileNameEl    = document.getElementById('fileName');
   const fileRemoveBtn = document.getElementById('fileRemove');
-  let selectedFile    = null;
 
-  // ── FILE SELECTION via input ─────────────────────────────────────
-  fileInput.addEventListener('change', function () {
-    if (this.files && this.files[0]) setFile(this.files[0]);
-  });
-
-  // ── DRAG & DROP ──────────────────────────────────────────────────
-  // dragover/drop events go on the wrapper (the input captures the pointer,
-  // but dataTransfer drops still bubble up to the wrapper)
+  // File selected via inline onchange handler (global fn above)
+  // Drag & drop on the zone
   let dragDepth = 0;
-  uploadWrapper.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
-  uploadWrapper.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
-  uploadWrapper.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
-  uploadWrapper.addEventListener('drop', e => {
-    e.preventDefault();
-    dragDepth = 0;
-    uploadZone.classList.remove('dragover');
+  uploadZone.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => { dragDepth--; if (dragDepth === 0) uploadZone.classList.remove('dragover'); });
+  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); dragDepth = 0; uploadZone.classList.remove('dragover');
     if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
   });
 
   function setFile(f) {
-    selectedFile = f;
+    window._selectedFile = f;
     fileNameEl.textContent = f.name;
     fileChosen.classList.add('visible');
     clearError('fieldFile');
   }
 
   fileRemoveBtn.addEventListener('click', () => {
-    selectedFile = null;
+    window._selectedFile = null;
     fileInput.value = '';
     fileChosen.classList.remove('visible');
     fileNameEl.textContent = '';
@@ -443,7 +434,7 @@
     let valid = true;
     if (!name)         { setError('fieldName',      true); valid = false; } else setError('fieldName',      false);
     if (!committee)    { setError('fieldCommittee', true); valid = false; } else setError('fieldCommittee', false);
-    if (!selectedFile) { setError('fieldFile',      true); valid = false; } else setError('fieldFile',      false);
+    if (!window._selectedFile) { setError('fieldFile', true); valid = false; } else setError('fieldFile', false);
     if (!valid) return;
 
     const btn = document.getElementById('submitBtn');
@@ -455,11 +446,11 @@
       const token = await getAccessToken();
 
       setStatus('Uploading file to Drive\u2026', 45);
-      const uploaded = await uploadToDrive(token, selectedFile, FOLDER_IDS[committee], name);
+      const uploaded = await uploadToDrive(token, window._selectedFile, FOLDER_IDS[committee], name);
 
       setStatus('Logging submission\u2026', 80);
       const committeeLabel = document.getElementById('committee').selectedOptions[0].text;
-      await logToSheet(token, name, committeeLabel, uploaded.webViewLink, selectedFile.name);
+      await logToSheet(token, name, committeeLabel, uploaded.webViewLink, window._selectedFile.name);
 
       setStatus('Done.', 100);
       await new Promise(r => setTimeout(r, 500));
@@ -480,8 +471,7 @@
   function resetForm() {
     document.getElementById('memberName').value = '';
     document.getElementById('committee').value  = '';
-    selectedFile = null;
-    fileInput.value = '';
+    window._selectedFile = null;
     fileChosen.classList.remove('visible');
     fileNameEl.textContent = '';
     ['fieldName', 'fieldCommittee', 'fieldFile'].forEach(id => setError(id, false));
