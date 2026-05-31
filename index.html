@@ -253,7 +253,7 @@
       </div>
 
       <div class="submit-wrap">
-        <button class="btn-submit" id="submitBtn" type="button">Submit Task</button>
+        <button class="btn-submit" id="submitBtn" type="button" onclick="handleSubmit()">Submit Task</button>
         <div class="progress-bar-wrap" id="progressWrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -292,8 +292,8 @@
     window._selectedFile = f;
   }
 </script>
-<script type="module">
-  import { SignJWT, importPKCS8 } from "https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js";
+<script src="https://cdn.jsdelivr.net/npm/jose@5.9.6/dist/browser/index.umd.js"></script>
+<script>
 
   // ── CONFIG ───────────────────────────────────────────────────────
   const SERVICE_ACCOUNT = {
@@ -375,8 +375,8 @@
   // ── GOOGLE AUTH ──────────────────────────────────────────────────
   async function getAccessToken() {
     const now = Math.floor(Date.now() / 1000);
-    const privateKey = await importPKCS8(SERVICE_ACCOUNT.private_key, 'RS256');
-    const jwt = await new SignJWT({
+    const privateKey = await jose.importPKCS8(SERVICE_ACCOUNT.private_key, 'RS256');
+    const jwt = await new jose.SignJWT({
       iss:   SERVICE_ACCOUNT.client_email,
       scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets',
       aud:   'https://oauth2.googleapis.com/token',
@@ -490,8 +490,7 @@
   // ── INLINE VALIDATION ────────────────────────────────────────────
   document.getElementById('memberName').addEventListener('input',  () => clearError('fieldName'));
   document.getElementById('committee').addEventListener('change',  () => clearError('fieldCommittee'));
-  document.getElementById('submitBtn').addEventListener('click',   handleSubmit);
-  document.getElementById('btnAgain').addEventListener('click',    resetForm);
+  document.getElementById('btnAgain').addEventListener('click', resetForm);
 </script>
 </body>
 </html>
