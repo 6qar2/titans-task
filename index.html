@@ -22,52 +22,6 @@ html, body { min-height: 100vh; background: var(--black); color: var(--gold-pale
 .top-line-1 { position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 5%,#5C0000 25%,#B30000 50%,#5C0000 75%,transparent 95%);z-index:100; }
 .top-line-2 { position:fixed;top:3px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 10%,rgba(201,168,76,0.25) 50%,transparent 90%);z-index:100; }
 
-/* ── MUSIC PLAYER ── */
-.music-btn {
-  position: fixed; bottom: 28px; right: 28px; z-index: 200;
-  width: 48px; height: 48px; border-radius: 50%;
-  background: rgba(10,8,6,0.85);
-  border: 1px solid rgba(201,168,76,0.3);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 20px rgba(139,0,0,0.3), inset 0 1px 0 rgba(201,168,76,0.08);
-}
-.music-btn:hover { border-color: rgba(201,168,76,0.6); box-shadow: 0 0 30px rgba(139,0,0,0.5), 0 0 15px rgba(201,168,76,0.15), inset 0 1px 0 rgba(201,168,76,0.1); transform: scale(1.06); }
-.music-btn.playing { border-color: rgba(201,168,76,0.5); box-shadow: 0 0 25px rgba(201,168,76,0.2), 0 0 50px rgba(139,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.1); animation: musicPulse 2s ease-in-out infinite; }
-@keyframes musicPulse { 0%,100%{box-shadow:0 0 25px rgba(201,168,76,0.2),0 0 50px rgba(139,0,0,0.4)} 50%{box-shadow:0 0 35px rgba(201,168,76,0.35),0 0 60px rgba(139,0,0,0.5)} }
-
-.music-icon-play, .music-icon-pause { display: none; }
-.music-icon-play svg, .music-icon-pause svg { width: 18px; height: 18px; fill: var(--gold); filter: drop-shadow(0 0 6px rgba(201,168,76,0.5)); }
-.music-btn:not(.playing) .music-icon-play { display: flex; }
-.music-btn.playing .music-icon-pause { display: flex; }
-
-/* Bars visualizer */
-.music-bars { display: none; align-items: flex-end; gap: 2px; height: 16px; }
-.music-btn.playing .music-bars { display: flex; }
-.music-btn.playing .music-icon-pause { display: none; }
-.bar { width: 3px; background: var(--gold); border-radius: 2px; animation: barDance 0.8s ease-in-out infinite; }
-.bar:nth-child(1) { animation-delay: 0s;    animation-duration: 0.7s; }
-.bar:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.9s; }
-.bar:nth-child(3) { animation-delay: 0.3s;  animation-duration: 0.6s; }
-.bar:nth-child(4) { animation-delay: 0.1s;  animation-duration: 1.0s; }
-@keyframes barDance {
-  0%,100% { height: 4px; opacity: 0.5; }
-  50%      { height: 14px; opacity: 1; }
-}
-
-/* Volume ring on hover */
-.music-label {
-  position: fixed; bottom: 34px; right: 84px; z-index: 200;
-  font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.3em;
-  color: rgba(201,168,76,0.5); text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.3s;
-}
-.music-btn:hover ~ .music-label,
-.music-btn:focus ~ .music-label { opacity: 1; }
-
 /* ── PAGE ── */
 .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 72px 24px 96px; }
 .header { text-align: center; margin-bottom: 52px; }
@@ -179,7 +133,6 @@ select option { background: var(--surface-3); color: var(--gold-pale); }
   .card { padding: 36px 24px 40px; }
   h1 { font-size: 58px; }
   .orn-line { width: 60px; }
-  .music-btn { bottom: 20px; right: 20px; width: 42px; height: 42px; }
 }
 </style>
 </head>
@@ -191,26 +144,8 @@ select option { background: var(--surface-3); color: var(--gold-pale); }
 <div class="top-line-1"></div>
 <div class="top-line-2"></div>
 
-<!-- MUSIC PLAYER -->
-<button class="music-btn" id="musicBtn" title="Toggle music" aria-label="Toggle ambient music">
-  <span class="music-icon-play">
-    <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-  </span>
-  <span class="music-icon-pause">
-    <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-  </span>
-  <span class="music-bars">
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-  </span>
-</button>
-<span class="music-label">Ambient</span>
 
-<audio id="bgMusic" loop preload="auto">
-  <source id="bgMusicSrc" type="audio/mpeg">
-</audio>
+<audio id="bgMusic" loop preload="auto"><source type="audio/mpeg"></audio>
 
 <div class="page">
   <header class="header">
@@ -322,38 +257,22 @@ select option { background: var(--surface-3); color: var(--gold-pale); }
 </div>
 
 <script>
-// ── MUSIC PLAYER ─────────────────────────────────────────────────────
-const musicBtn = document.getElementById('musicBtn');
-const bgMusic  = document.getElementById('bgMusic');
+// ── MUSIC (invisible autoplay on first interaction) ──────────────────
+const bgMusic = document.getElementById('bgMusic');
 bgMusic.src = 'Shimza_x_ARCO_x_Kasango_-_Fire_Fire__Visualizer___Helix_Records_.mp3';
 bgMusic.volume = 0.35;
-
-let musicStarted = false;
-
-function toggleMusic() {
-  if (bgMusic.paused) {
-    bgMusic.play().then(() => { musicBtn.classList.add('playing'); }).catch(() => {});
-  } else {
-    bgMusic.pause();
-    musicBtn.classList.remove('playing');
-  }
+let _musicStarted = false;
+function _startMusic() {
+  if (_musicStarted) return;
+  _musicStarted = true;
+  bgMusic.play().catch(() => {});
+  document.removeEventListener('click',      _startMusic);
+  document.removeEventListener('touchstart', _startMusic);
+  document.removeEventListener('keydown',    _startMusic);
 }
-
-musicBtn.addEventListener('click', toggleMusic);
-
-function tryAutoplay(e) {
-  if (musicStarted) return;
-  if (e.target === musicBtn || musicBtn.contains(e.target)) return;
-  musicStarted = true;
-  bgMusic.play().then(() => { musicBtn.classList.add('playing'); }).catch(() => {});
-  document.removeEventListener('click', tryAutoplay);
-  document.removeEventListener('keydown', tryAutoplay);
-  document.removeEventListener('touchstart', tryAutoplay);
-}
-
-document.addEventListener('click', tryAutoplay);
-document.addEventListener('keydown', tryAutoplay);
-document.addEventListener('touchstart', tryAutoplay);
+document.addEventListener('click',      _startMusic);
+document.addEventListener('touchstart', _startMusic);
+document.addEventListener('keydown',    _startMusic);
 </script>
 
 <script>
