@@ -480,7 +480,8 @@ bgMusic.volume = 0.35;
 let musicPlaying = false;
 
 function startMusic() {
-bgMusic.play().catch(function() {});  musicPlaying = true;
+  bgMusic.play().catch(function() {});
+  musicPlaying = true;
   document.getElementById('musicDot').classList.remove('paused');
   document.getElementById('iconPause').style.display = '';
   document.getElementById('iconPlay').style.display = 'none';
